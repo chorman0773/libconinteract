@@ -32,8 +32,8 @@ int32_t menu(const char* title,const char* const itemv[]){
 		case '\033':
 			return MENU_CLOSE;
 		}
-		if(selection>itemc)
-			while(selection>itemc)
+		if(selection>=itemc)
+			while(selection>=itemc)
 				selection-=itemc;
 		else while(selection<0)
 			selection +=itemc;
