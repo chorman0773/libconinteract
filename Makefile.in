@@ -1,0 +1,41 @@
+
+CDIALECT = c99
+
+SRCDIR = @srcdir@
+BUILDDIR = @builddir@
+OUTDIR = $(BUILDDIR)/out
+
+CFLAGS := @CFLAGS@
+CC = @CC@
+AR = @AR@
+
+OBJECTS = $(OUTDIR)/Menu.o $(OUTDIR)/WaitInput.o $(OUTDIR)/ClearScreen.o
+
+OUTPUT = $(BUILDDIR)/libconinteract.a
+
+INCLUDES = $(SRCDIR)/include
+
+TESTS := 
+
+ALL_CFLAGS = $(CFLAGS) $(foreach include,$(INCLUDES),-I$(include)) -fPIC
+
+all: $(OUTPUT)
+
+$(OUTPUT): $(OBJECTS)
+	$(AR) rcs $(OUTPUT) $(OBJECTS)
+
+test: $(TESTS)
+
+$(OUTDIR)/:
+	mkdir $(OUTDIR)/
+
+$(OUTDIR)/%.o: src/%.c | $(OUTDIR)/
+	$(CC) $(ALL_CFLAGS) -c -o $@ $^
+
+
+test-%: $(SRCDIR)/test/%.c $(OBJECTS)
+	 $(CC) $(LDFLAGS) -o test/$@ 
+
+
+clean:
+	rm -rf out/ $(OUTPUT)
