@@ -7,15 +7,12 @@
 
 #include <ConInteract.h>
 
-#include <termios.h>
-#include <unistd.h>
 #include <stdio.h>
 
 
 #if defined(__GNUC__)
 #define unreachable() __builtin_unreachable()
 #else
-
 #if !defined(__has_builtin)
 #define __has_builtin(n) 0
 #endif
@@ -23,12 +20,14 @@
 #define unreachable() __builtin_unreachable()
 #else
 #include <stdlib.h>
-#define unreachable() abort();
+#define unreachable() (void)*((int*)0);
 #endif
 
 #endif
 
-
+#ifndef WIN32
+#include <termios.h>
+#include <unistd.h>
 int waitch(){
 	struct termios oldattr, newattr;
 	int ch;
@@ -40,6 +39,12 @@ int waitch(){
 	tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
 	return ch;
 }
+#else
+#include <conio.h>
+int waitch(){
+    return _getch();
+}
+#endif
 
 void waitInput(){
 	waitch();
