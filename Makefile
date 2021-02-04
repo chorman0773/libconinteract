@@ -1,4 +1,6 @@
 
+OPTIMIZATIONS := -O3 -flto
+
 CDIALECT = c99
 
 OBJECTS = out/Menu.o out/WaitInput.o out/ClearScreen.o
@@ -21,7 +23,7 @@ test: $(TESTS)
 out/:
 	mkdir out/	
 
-out/%.o: src/%.c | out/
+out/%.o: src/%.c | out/ Makefile
 	$(CC) $(ALL_CFLAGS) -c -o $@ $^
 
 

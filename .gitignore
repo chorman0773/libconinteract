@@ -1,0 +1,5 @@
+/libconinteract.a
+/out
+/build*
+/cmake-build*
+

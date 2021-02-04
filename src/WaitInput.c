@@ -9,7 +9,6 @@
 
 #include <stdio.h>
 
-
 #if defined(__GNUC__)
 #define unreachable() __builtin_unreachable()
 #else
@@ -20,7 +19,7 @@
 #define unreachable() __builtin_unreachable()
 #else
 #include <stdlib.h>
-#define unreachable() (void)*((int*)0);
+#define unreachable() (void)*((int *)0);
 #endif
 
 #endif
@@ -28,34 +27,48 @@
 #ifndef WIN32
 #include <termios.h>
 #include <unistd.h>
-int waitch(){
+#include <errno.h>
+int waitch()
+{
+	fsync(STDOUT_FILENO);
 	struct termios oldattr, newattr;
-	int ch;
-	tcgetattr( STDIN_FILENO, &oldattr );
+	unsigned char ch;
+	tcgetattr(STDIN_FILENO, &oldattr);
 	newattr = oldattr;
-	newattr.c_lflag &= ~( ICANON | ECHO );
-	tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
-	ch = getchar();
-	tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
+	newattr.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+	if (read(STDIN_FILENO, &ch, 1) <= 0)
+	{
+		int errn = errno; // Preserve errno
+		tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+		errno = errn;
+		return -1;
+	}
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
 	return ch;
 }
 #else
 #include <conio.h>
-int waitch(){
-    return _getch();
+int waitch()
+{
+	return _getch();
 }
 #endif
 
-void waitInput(){
+void waitInput()
+{
 	waitch();
 }
 
-KeyDirection waitDirection(){
-	for(;;){
+KeyDirection waitDirection()
+{
+	for (;;)
+	{
 		int ch = waitch();
 		//Has Observable-behavior
 		//so this loop isn't UB.
-		switch(ch){
+		switch (ch)
+		{
 		case 'w':
 		case 'W':
 			return KEY_UP;
@@ -76,4 +89,3 @@ KeyDirection waitDirection(){
 	}
 	unreachable();
 }
-
